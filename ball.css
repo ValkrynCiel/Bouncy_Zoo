@@ -1,0 +1,33 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: gray;
+}
+
+#canvas-background {
+    position: absolute;
+    height: 90%;
+    width: 72%;
+    margin: auto;
+    background-color: rgb(228, 225, 187);
+    border-radius: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 3%;
+}
+
+#canvas {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#test{
+    z-index: 10;
+}
