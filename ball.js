@@ -10,9 +10,11 @@ var height = canvasDiv.clientHeight;
 canvas.width = width;
 canvas.height = height;
 
+
 //with each click, a new circle is drawn
 canvas.addEventListener('mousemove', getMousePosition);
 canvas.addEventListener('click', createCircle);
+
 
 function getMousePosition(){// this should return an OBJECT with the x and y coords of mouse relative to canvas
     var canvasBoundary = canvas.getBoundingClientRect(); 
@@ -61,6 +63,31 @@ function circle(){ // this creates information for movement, position, size, and
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         context.fill();
     }
+    if (circle.y + circle.radius > height){
+        circle.y = height - circle.radius - 1;
+        if (circle.radius + circle.x > width){
+            circle.x = width - circle.radius -1;
+        } else if (circle.x - circle.radius <= 0){
+            circle.x = 1 + circle.radius;
+        }
+    } else if (circle.y - circle.radius <= 0){
+        circle.y = circle.radius + 1;
+        if (circle.dy < 0){
+            circle.dy = circle.dy;
+        }
+        if (circle.radius + circle.x > width){
+            circle.x = width - circle.radius -1;
+        } else if (circle.x - circle.radius <= 0){
+            circle.x = 1 + circle.radius;
+        } 
+    } else {
+        if (circle.radius + circle.x > width){
+            circle.x = width - circle.radius -1;
+        } else if (circle.x - circle.radius <= 0){
+            circle.x = 1 + circle.radius;
+        }
+    }
+
     console.log(circle)
     return circle;
 }
@@ -94,7 +121,7 @@ function animate() {
         if (collection[i].x + collection[i].radius > width || collection[i].x - collection[i].radius <= 0){
             collection[i].dx = -collection[i].dx;
             }
-        if (collection[i].y + collection[i].radius >= height){
+        if (collection[i].y + collection[i].radius >= height || collection[i].y - collection[i].radius <=0){
             collection[i].dy = -collection[i].dy;
         } else {
             collection[i].dy += collection[i].velocity;
@@ -103,4 +130,15 @@ function animate() {
     }
 }
 animate();
+
+var mouseIsDown = false;
+var adjustedRad = 0;
+
+canvas.addEventListener('mousedown', function(){
+    mouseIsDown = true;
+});
+
+canvas.addEventListener('mouseup', function(){
+    mouseIsDown = false;
+});
 
