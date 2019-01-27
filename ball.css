@@ -31,3 +31,11 @@ body{
 #test{
     z-index: 10;
 }
+
+#sidebar{
+    width: 25%;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}

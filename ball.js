@@ -11,9 +11,11 @@ canvas.width = width;
 canvas.height = height;
 
 
+
+
 //with each click, a new circle is drawn
 canvas.addEventListener('mousemove', getMousePosition);
-canvas.addEventListener('click', createCircle);
+canvas.addEventListener('mouseup', createCircle);
 
 
 function getMousePosition(){// this should return an OBJECT with the x and y coords of mouse relative to canvas
@@ -48,21 +50,34 @@ function createCircle(){
 function circle(){ // this creates information for movement, position, size, and behavior of circle.
 
     var position = getMousePosition();
+    
     var circle = {
         color: randomColor(),
-        radius: (Math.random()*30) + 10,
+        radius: /*(Math.random()*30) + 10,*/ adjustRadius(),
         x: position.x,
         y: position.y,
         dy:(Math.random() * 4) - 2, // this will add movement on Y axis
         dx:Math.round((Math.random() - 0.5) * 10), // add movement on X axis
-        velocity:Math.random() /5 // this will create a smooth bouncing effect when added to dy (dy += velocity = gain in momentum) and -dy (-dy += velocity = loss in momentum)
+        velocity:Math.random() /5, // this will create a smooth bouncing effect when added to dy (dy += velocity = gain in momentum) and -dy (-dy += velocity = loss in momentum)
     };
-    circle.update = function(){ // this function will be called when the collection array is iterated through and will use the information provided by the object
+        // if (!circle.hasOwnProperty('original_dy')){
+        //     circle.original_dy = circle.dy;
+        //     circle.original_dx = circle.dy;
+        //     circle.original_vel = circle.velocity;
+        // }
+        // circle.dy_gradient = circle.original_dy/5; // need these to slow down time later in gradualSlow()
+        // circle.dx_gradient = circle.original_dx/5;
+        // circle.vel_gradient = circle.original_vel/5;
+    
+        circle.update = function(){ // this function will be called when the collection array is iterated through and will use the information provided by the object
         context.fillStyle = circle.color;
         context.beginPath();
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         context.fill();
     }
+
+    // DEALING WITH EDGE CASES. clicking on the edge moves the X and Y axes out from the edge so the balls won't get stuck. deals with corners too.
+
     if (circle.y + circle.radius > height){
         circle.y = height - circle.radius - 1;
         if (circle.radius + circle.x > width){
@@ -71,10 +86,8 @@ function circle(){ // this creates information for movement, position, size, and
             circle.x = 1 + circle.radius;
         }
     } else if (circle.y - circle.radius <= 0){
-        circle.y = circle.radius + 1;
-        if (circle.dy < 0){
-            circle.dy = circle.dy;
-        }
+        circle.y = circle.radius + 10;
+        
         if (circle.radius + circle.x > width){
             circle.x = width - circle.radius -1;
         } else if (circle.x - circle.radius <= 0){
@@ -86,8 +99,7 @@ function circle(){ // this creates information for movement, position, size, and
         } else if (circle.x - circle.radius <= 0){
             circle.x = 1 + circle.radius;
         }
-    }
-
+    } 
     console.log(circle)
     return circle;
 }
@@ -101,6 +113,35 @@ function randomColor(){
     return `rgba(${r},${g},${b},${(a/10)+ 0.4})`
 
 }
+var paused = false;
+
+var pauseButton = document.getElementById('slowdown');
+
+pauseButton.addEventListener('click', function (){
+    // setIntervalX(gradualSlow, 200, 5) 
+    paused = !paused;
+});
+
+
+// function setIntervalX(callback, delay, repetitions) { //Stack Overflow: this allows for setting of intervals for X amount of times before quitting
+//     var x = 0;
+//     var intervalID = window.setInterval(function () {
+
+//        callback();
+
+//        if (++x === repetitions) {
+//            window.clearInterval(intervalID);
+//        }
+//     }, delay);
+// }
+
+// function gradualSlow(){
+//     for (i=0; i < collection.length; i++){
+//         collection[i].dy -= collection[i].dy_gradient
+//         collection[i].dx -= collection[i].dx_gradient
+//         collection[i].velocity -= collection[i].vel_gradient
+//     }
+// }
 
 function animate() {    
     if (canvas.width !== canvasDiv.clientWidth || canvas.height != canvasDiv.clientHeight) { // this makes it so that 
@@ -111,34 +152,52 @@ function animate() {
         canvas.height = height;
     }
 
-    requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
 
     context.clearRect(0, 0, width, height);
     for (var i = 0; i < collection.length; i++) {
         collection[i].update();
-        collection[i].y += collection[i].dy;
-        collection[i].x += collection[i].dx;
-        if (collection[i].x + collection[i].radius > width || collection[i].x - collection[i].radius <= 0){
-            collection[i].dx = -collection[i].dx;
+            if (paused === false){
+                collection[i].y += collection[i].dy;
+                collection[i].x += collection[i].dx;
+            if (collection[i].x + collection[i].radius > width || collection[i].x - collection[i].radius <= 0){
+                collection[i].dx = -collection[i].dx;
+                }
+            if (collection[i].y + collection[i].radius >= height || collection[i].y - collection[i].radius <=0){
+                collection[i].dy = -collection[i].dy;
+            } else {
+                collection[i].dy += collection[i].velocity;
             }
-        if (collection[i].y + collection[i].radius >= height || collection[i].y - collection[i].radius <=0){
-            collection[i].dy = -collection[i].dy;
-        } else {
-            collection[i].dy += collection[i].velocity;
-        }
         
+        }
     }
 }
 animate();
-
 var mouseIsDown = false;
-var adjustedRad = 0;
+var adjustedRad = 10;
 
-canvas.addEventListener('mousedown', function(){
+canvas.addEventListener('mousedown', adjustRadius);
+
+function adjustRadius(){
     mouseIsDown = true;
-});
+    var intervalID = window.setInterval(function () {
+
+               adjustedRad += 0.3
+        
+               if (mouseIsDown === false) {
+                   window.clearInterval(intervalID);
+                   console.log(adjustedRad);
+                   
+               }
+            }, 4);
+    return adjustedRad;
+};
 
 canvas.addEventListener('mouseup', function(){
     mouseIsDown = false;
+    setTimeout(function(){
+        adjustedRad = 10
+    }, 5);
 });
+
 
