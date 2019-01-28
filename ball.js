@@ -131,12 +131,12 @@ canvas.addEventListener('mousedown', randomColor);
 
 function randomColor(){
 
-    var r = Math.round(Math.random() * 250); // random colors
-    var g = Math.round(Math.random() * 250);
-    var b = Math.round(Math.random() * 250);
+    var r;// random colors
+    var g;
+    var b;
     var a = Math.ceil(Math.random() * 5); // random opacity that tends towards more opaque
 
-    //literally 140 HTML/CSS named colors as objects with RGB keys sorted by color profile
+    //literally 140 HTML/CSS named colors as objects with RGB keys sorted by color profile 
     var whites = [{name:'white', r:255, g:255, b:255}, {name:'snow', r:255, g:250, b:250}, {name:'honeydew', r:240, g:255, b:240}, {name:'mintcream', r:245, g:255, b:250}, {name:'azure', r:240, g:255, b:255}, {name:'aliceblue', r:240, g:248, b:255}, {name:'ghostwhite', r:248, g:248, b:255}, {name:'whitesmoke', r:245, g:245, b:245}, {name:'seashell', r:255, g:245, b:238}, {name:'beige', r:245, g:245, b:220}, {name:'oldlace',r:253, g:245, b:230}, {name:'floralwhite', r:255, g:250, b:240}, {name:'ivory', r:255, g:255, b:240}, {name:'antiquewhite',	r:250, g:235, b:215}, {name:'linen',r:250, g:240, b:230}];
 
     var grays = [{name:'gainsboro',r:220, g:220, b:220}, {name:'lightgray', r:211, g:211, b:211}, {name:'silver', r:192, g:192, b:192}, {name:'darkgray',r:169, g:169, b:169}, {name: 'gray', r:128, g:128, b:128}, {name:'dimgray',r:105, g:105, b:105}, {name:'lightslategray', r:119, g:136, b:153}, {name:'slategray', r:112, g:128, b:144}, {name:'darkslategray',r:47, g:79, b:79}, {name: 'black', r:0, g:0, b:0}];
@@ -145,7 +145,7 @@ function randomColor(){
 
     var pinks = [{name: 'pink', r:255, g:192, b:203}, {name: 'lightpink', r:255, g:182, b:193}, {name: 'hotpink', r:255, g:105, b:180}, {name: 'deeppink', r:255, g:20, b:147}, {name: 'mediumvioletred', r:199, g:21, b:133}, {name: 'palevioletred', r:219, g:112, b:147}, {name:'peachpuff', r:255, g:218, b:185}, {name: 'plum',r:221, g:160, b:221}, {name:'violet', r:238, g:130, b:238},{name: 'magenta', r:255, g:0, b:255}, {name:'lavenderblush', r:255, g:240, b:245}, {name:'mistyrose', r:255, g:228, b:225}];
 
-    var oranges = [{name: 'lightsalmon', r:255, g:160, b:122}, {name: 'coral', r:255, g:127, b:80}, {name: 'tomato', r:255, g:99, b:71}, {name: 'orangered', r:255, g:69, b:0}, {name: 'darkorange', r:255, g:140, b:0}, {name: orange, r:255, g:165, b:0}, {name: 'papayawhip', r:255, g:239, b:213}, {name: 'moccasin', r:255, g:228, b:181}];
+    var oranges = [{name: 'lightsalmon', r:255, g:160, b:122}, {name: 'coral', r:255, g:127, b:80}, {name: 'tomato', r:255, g:99, b:71}, {name: 'orangered', r:255, g:69, b:0}, {name: 'darkorange', r:255, g:140, b:0}, {name: 'orange', r:255, g:165, b:0}, {name: 'papayawhip', r:255, g:239, b:213}, {name: 'moccasin', r:255, g:228, b:181}];
 
     var yellows = [{name: 'gold', r:255, g:215, b:0}, {name: 'yellow', r:255, g:255, b:0}, {name: 'lightyellow', r:255, g:255, b:224}, {name: 'lemonchiffon', r:255, g:250, b:205}, {name: 'lightgoldenrodyellow', r:250, g:250, b:210},  {name: 'palegoldenrod', r:238, g:232, b:170}, {name: 'khaki', r:240, g:230, b:140}, {name: 'cornsilk', r:255, g:248, b:220}]
 
@@ -157,11 +157,30 @@ function randomColor(){
 
     var browns = [{name: 'blanchedalmond', r:255, g:235, b:205}, {name: 'bisque', r:255, g:228, b:196}, {name: 'navajowhite', r:255, g:222, b:173}, {name: 'wheat', r:245, g:222, b:179}, {name: 'burlywood', r:222, g:184, b:135}, {name: 'tan', r:210, g:180, b:140}, {name:'rosybrown', r:188, g:143, b:143}, {name:'sandybrown', r:244, g:164, b:96}, {name: 'goldenrod', r:218, g:165, b:32}, {name: 'darkgoldenrod', r:184, g:134, b:11}, {name: 'peru', r:205, g:133, b:63}, {name: 'chocolate', r:210, g:105, b:30}, {name:'saddlebrown', r:139, g:69, b:19}, {name:'sienna', r:160, g:82, b:45}, {name:'brown', r:165, g:42, b:42}, {name:'maroon', r:128, b:0, g:0}, {name: 'darkkhaki', r:189, g:183, b:107}]
 
-    thisColor = gray
-    thisOne = Math.floor(Math.random()*thisColor.length)
-    r = thisColor[thisOne].r
-    g = thisColor[thisOne].g
-    b = thisColor[thisOne].b
+    var colorArr = [whites, grays, reds, pinks, oranges, yellows, greens, blues, purples, browns];
+
+    var colorChoice = document.querySelectorAll('[name = "color"]');
+
+    for (i=0; i<colorChoice.length; i++){
+    if (colorChoice[i].checked){
+
+        if (colorChoice[i].value != 'random'){
+
+        thisColor = colorArr[Number(colorChoice[i].value)]
+        thisOne = Math.floor(Math.random()*thisColor.length)
+
+            r = thisColor[thisOne].r
+            g = thisColor[thisOne].g
+            b = thisColor[thisOne].b
+        } else {
+            r = Math.round(Math.random() * 250); // random colors
+            g = Math.round(Math.random() * 250);
+            b = Math.round(Math.random() * 250);
+        }
+
+        break;
+    }
+}
     nextRandomColor = `rgba(${r},${g},${b},${(a/10)+ 0.4})`
 
 }
