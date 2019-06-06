@@ -1,7 +1,7 @@
 # Orbs
 
 **Beginnings of a calming physics simulator/game - built before web development curriculum** <br>
-![image of Orbs](./minesweeper.jpg)
+![image of Orbs](./Orbs.jpg)
 * Click and hold down on the canvas to create an orb of varying size.
 * Let go and watch it bounce, up to 25 can be on the canvas at a time.
 * Orbs stuck the the side walls of the canvas will float around the screen.
