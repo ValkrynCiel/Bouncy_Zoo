@@ -1,4 +1,6 @@
-//setting context to 2d every time I draw something
+//inspired by Roger van Hout's "Happy Bouncing Balls" @ https://codepen.io/b4rb4tron/full/wjyXNJ
+
+
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var test = document.getElementById('test');
@@ -10,11 +12,11 @@ var height = canvasDiv.clientHeight;
 canvas.width = width;
 canvas.height = height;
 
-var position = {}; // 
+
 var nextRandomColor = null;
 
 var paused = false;
-var pauseButton = document.getElementById('slowdown');
+var pauseButton = document.getElementById('pause');
 
 pauseButton.addEventListener('click', function (){
     // setIntervalX(gradualSlow, 200, 5) 
@@ -33,10 +35,11 @@ canvas.addEventListener('mousemove', getMousePosition);
 canvas.addEventListener('mouseup', createCircle);
 canvas.addEventListener('mouseleave', createCircle);
 
+var position = {};
 
 function getMousePosition(){// this should return an OBJECT with the x and y coords of mouse relative to canvas
     var canvasBoundary = canvas.getBoundingClientRect(); 
-
+    
     test.innerText = `
     ${Math.floor(event.clientX - canvasBoundary.left)} 
     ${Math.floor(event.clientY - canvasBoundary.top)}
@@ -45,12 +48,14 @@ function getMousePosition(){// this should return an OBJECT with the x and y coo
         x: Math.floor(event.clientX - canvasBoundary.left),
         y: Math.floor(event.clientY - canvasBoundary.top)
     };
+
 }
 
-var counter = -1;       // counter set to -1 so that onclick even triggers 0 position of array
-var collection = [];    // array to keep all the circle objects created
+var counter = -1;       // counter set to -1 so that onclick triggers 0 position of array
+var collection = [];    // array to keep all the circle objects
+
 function createCircle(){
-    var newCircle = circle();
+    var newCircle = defineCircleObj();
         if (adjustedRad > 10){
         collection.push(newCircle)
         if (collection.length < 25){
@@ -64,27 +69,25 @@ function createCircle(){
 }
 
 
-function circle(){ // this creates information for movement, position, size, and behavior of circle.
+function defineCircleObj(){ // this creates information for movement, position, size, and behavior of circle.
 
+    let dyVal = (Math.random() * 4) - 2
+    let dxVal = Math.round((Math.random() - 0.5) * 10)
+    let velVal = Math.random() /5
     
     var circle = {
         color: nextRandomColor,
         radius: /*(Math.random()*30) + 10,*/ adjustedRad,
         x: position.x,
         y: position.y,
-        dy:(Math.random() * 4) - 2, // this will add movement on Y axis
-        dx:Math.round((Math.random() - 0.5) * 10), // add movement on X axis
-        velocity:Math.random() /5, // this will create a smooth bouncing effect when added to dy (dy += velocity = gain in momentum) and -dy (-dy += velocity = loss in momentum)
-    };
-        // if (!circle.hasOwnProperty('original_dy')){
-        //     circle.original_dy = circle.dy;
-        //     circle.original_dx = circle.dy;
-        //     circle.original_vel = circle.velocity;
-        // }
-        // circle.dy_gradient = circle.original_dy/5; // need these to slow down time later in gradualSlow()
-        // circle.dx_gradient = circle.original_dx/5;
-        // circle.vel_gradient = circle.original_vel/5;
+        dy: dyVal, // this will add movement on Y axis
+        dx: dxVal, // add movement on X axis
+        velocity: velVal// this will create a smooth bouncing effect when added to dy (dy += velocity = gain in momentum) and -dy (-dy += velocity = loss in momentum)
     
+        // original_vel: velVal
+    };
+        
+
         circle.update = function(){ // this function will be called when the collection array is iterated through and will use the information provided by the object
         context.fillStyle = circle.color;
         context.beginPath();
@@ -92,13 +95,12 @@ function circle(){ // this creates information for movement, position, size, and
         context.fill();
     }
         
-    fitInTheBox(circle);
+    adjustXnYToFit(circle);
     
-    console.log(circle)
     return circle;
 }
 
-function fitInTheBox(circle){
+function adjustXnYToFit(circle){
     
     // DEALING WITH EDGE CASES. clicking on the edge moves the X and Y axes out from the edge so the balls won't get stuck. deals with corners too.
     if (circle.y + circle.radius > height){
@@ -122,7 +124,7 @@ function fitInTheBox(circle){
             circle.velocity = 0; // this creates floating effect when circles are made at right of screen
         } else if (circle.x - circle.radius <= 0){
             circle.x = 1 + circle.radius;
-            circle.velocity = 0; // left of screen
+            circle.velocity = 0; // '' '' left of screen
         }
     } 
 }
@@ -136,7 +138,7 @@ function randomColor(){
     var b;
     var a = Math.ceil(Math.random() * 5); // random opacity that tends towards more opaque
 
-    //literally 140 HTML/CSS named colors as objects with RGB keys sorted by color profile 
+    //140 HTML/CSS named colors as objects with RGB keys sorted by color profile 
     var whites = [{name:'white', r:255, g:255, b:255}, {name:'snow', r:255, g:250, b:250}, {name:'honeydew', r:240, g:255, b:240}, {name:'mintcream', r:245, g:255, b:250}, {name:'azure', r:240, g:255, b:255}, {name:'aliceblue', r:240, g:248, b:255}, {name:'ghostwhite', r:248, g:248, b:255}, {name:'whitesmoke', r:245, g:245, b:245}, {name:'seashell', r:255, g:245, b:238}, {name:'beige', r:245, g:245, b:220}, {name:'oldlace',r:253, g:245, b:230}, {name:'floralwhite', r:255, g:250, b:240}, {name:'ivory', r:255, g:255, b:240}, {name:'antiquewhite',	r:250, g:235, b:215}, {name:'linen',r:250, g:240, b:230}];
 
     var grays = [{name:'gainsboro',r:220, g:220, b:220}, {name:'lightgray', r:211, g:211, b:211}, {name:'silver', r:192, g:192, b:192}, {name:'darkgray',r:169, g:169, b:169}, {name: 'gray', r:128, g:128, b:128}, {name:'dimgray',r:105, g:105, b:105}, {name:'lightslategray', r:119, g:136, b:153}, {name:'slategray', r:112, g:128, b:144}, {name:'darkslategray',r:47, g:79, b:79}, {name: 'black', r:0, g:0, b:0}];
@@ -166,16 +168,16 @@ function randomColor(){
 
         if (colorChoice[i].value != 'random'){
 
-        thisColor = colorArr[Number(colorChoice[i].value)]
-        thisOne = Math.floor(Math.random()*thisColor.length)
+        thisColor = colorArr[+colorChoice[i].value]
+        thisHue = Math.floor(Math.random()*thisColor.length)
 
-            r = thisColor[thisOne].r
-            g = thisColor[thisOne].g
-            b = thisColor[thisOne].b
+            r = thisColor[thisHue].r
+            g = thisColor[thisHue].g
+            b = thisColor[thisHue].b
         } else {
-            r = Math.round(Math.random() * 250); // random colors
-            g = Math.round(Math.random() * 250);
-            b = Math.round(Math.random() * 250);
+            r = Math.floor(Math.random() * 256); // random colors
+            g = Math.floor(Math.random() * 256);
+            b = Math.floor(Math.random() * 256);
         }
 
         break;
@@ -206,34 +208,61 @@ function randomColor(){
 //     }
 // }
 
+var timeIsSlowed = false;
+
+var slowDownButton = document.getElementById('slowDown')
+
+slowDownButton.addEventListener('click', toggleSlow)
+
+function toggleSlow(){
+    timeIsSlowed = !timeIsSlowed
+}
 
 function animate() { 
-        
-    
 
-    if (canvas.width !== canvasDiv.clientWidth || canvas.height != canvasDiv.clientHeight) { // this makes it so that 
+    if (canvas.width !== canvasDiv.clientWidth || canvas.height != canvasDiv.clientHeight) { // this resets canvas height/width if window is resized
         
         width = canvasDiv.clientWidth;
         height = canvasDiv.clientHeight;
         canvas.width = width;
         canvas.height = height;
     }
-
+    
         requestAnimationFrame(animate);
+
         context.clearRect(0, 0, width, height);
 
-        if (mouseIsDown === true){
-        context.fillStyle = nextRandomColor;
-        context.beginPath();
-        context.arc(position.x, position.y, adjustedRad, 0, 2*Math.PI);
-        context.fill();
-        }
+    for (let i = 0; i < collection.length; i++) {
+            collection[i].update();
 
-    for (var i = 0; i < collection.length; i++) {
-        collection[i].update();
-            if (paused === false){
-                collection[i].y += collection[i].dy;
-                collection[i].x += collection[i].dx;
+        if (timeIsSlowed === true){
+            
+            
+            var intervalID = window.setInterval(() => {
+        
+            for (let i=0; i < collection.length; i++){
+                collection[i].dy_gradient = collection[i].dy /500
+                collection[i].dx_gradient = collection[i].dx /500
+                collection[i].vel_gradient = collection[i].velocity /500
+
+                collection[i].dy -= collection[i].dy_gradient
+                collection[i].dx -= collection[i].dx_gradient
+                collection[i].velocity -= collection[i].vel_gradient
+
+                
+            }
+            if (Math.abs(collection[0].dx) < Math.abs(collection[0].original_dx/10)) {
+                window.clearInterval(intervalID);
+            }  
+            }, 300);
+
+        }
+        
+        if (paused === false){
+
+            collection[i].y += collection[i].dy;
+            collection[i].x += collection[i].dx;
+
             if (collection[i].x + collection[i].radius > width || collection[i].x - collection[i].radius <= 0){
                 collection[i].dx = -collection[i].dx;
                 }
@@ -244,9 +273,24 @@ function animate() {
             }
         
         }
+    
     }
+
+    if (mouseIsDown === true){
+        growCircleOnDownClick();
+        }
 }
 animate();
+
+function growCircleOnDownClick() {
+
+    context.fillStyle = nextRandomColor;
+        context.beginPath();
+        context.arc(position.x, position.y, adjustedRad, 0, 2*Math.PI);
+        context.fill();
+}
+
+
 var mouseIsDown = false;
 var adjustedRad = 10;
 
@@ -257,7 +301,7 @@ function adjustRadius(){
     var intervalID = window.setInterval(function () {
 
             if (adjustedRad < 250){
-            adjustedRad += 0.3
+            adjustedRad += 0.5
             }
             if (mouseIsDown === false) {
                 window.clearInterval(intervalID);
@@ -277,5 +321,3 @@ function mouseIsNotDown(){
         adjustedRad = 10
     }, 10);
 };
-
-
